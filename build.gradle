@@ -1,6 +1,6 @@
 plugins {
 	id 'java'
-	id 'war'
+	//id 'war'
 	id 'org.springframework.boot' version '2.7.5'
 	id 'io.spring.dependency-management' version '1.0.15.RELEASE'
 }
@@ -24,7 +24,7 @@ dependencies {
 	compileOnly 'org.projectlombok:lombok'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	annotationProcessor 'org.projectlombok:lombok'
-	providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
+	//providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
 	// 데이터베이스 관련 라이브러리
@@ -32,8 +32,18 @@ dependencies {
 	runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
 	implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:2.2.2'
 
+	//JWT관련 라이브러리
+
+	implementation 'io.jsonwebtoken:jjwt-api:0.11.2'
+	implementation 'io.jsonwebtoken:jjwt-impl:0.11.2'
+	implementation 'io.jsonwebtoken:jjwt-jackson:0.11.2'
+
+	// 스프링 시큐리티 모듈 ,뒤에 버전 안적으면 최적화된 버전을 받아 줌.
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+
 }
 
 tasks.named('test') {
-	useJUnitPlatform()
+//	useJUnitPlatform()
+	exclude '**/*'
 }

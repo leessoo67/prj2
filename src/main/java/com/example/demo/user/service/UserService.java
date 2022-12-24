@@ -4,6 +4,7 @@ import com.example.demo.user.entity.UserEntity;
 import com.example.demo.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
 public class UserService {
 
     private final UserRepository userRepository;
+    private  final PasswordEncoder encoder;
 
     // 회원 가입 기능
     public UserEntity createServ(final UserEntity userEntity) throws RuntimeException {
@@ -19,18 +21,43 @@ public class UserService {
             throw new RuntimeException("Invalid args!");
         }
 
+
+        //패스워드 인코딩 , 비번이 저장되기 전에 바꿔줘야 한다.
+         String rawPw =userEntity.getPassword();
+        userEntity.setPassword(encoder.encode(rawPw));
         boolean flag = userRepository.register(userEntity);
 
         return flag
-                ? getByCredential(userEntity)
+                ? getByCredential(userEntity.getEmail())
                 : null;
     }
 
-    public UserEntity getByCredential(UserEntity userEntity) {
-        return userRepository.findUserByEmail(userEntity.getEmail());
+    public UserEntity getByCredential(String email) {
+        return userRepository.findUserByEmail(email);
+    }
+
+    // 로그인 검증 메서드
+    public UserEntity validateLogin(final String email, final String password) {
+
+        // 회원가입을 했는가?
+        UserEntity user = getByCredential(email);
+
+        if (user == null) throw new RuntimeException("가입된 회원이 아닙니다.");
+
+        // 패스워드가 일치하는가?
+        if (!encoder.matches(password, user.getPassword())){
+            throw new RuntimeException("비밀번호가 틀렸습니다.");
+        }
+
+        return user; // 로그인 성공시 회원정보 리턴
+    }
+
+    //이메일 중복체크
+
+    public  boolean isDuplicete(String email) {
+        return userRepository.existsByEmail(email);
     }
 }
-
 
 
 
